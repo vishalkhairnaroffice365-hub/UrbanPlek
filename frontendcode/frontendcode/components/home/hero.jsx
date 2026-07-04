@@ -1,0 +1,284 @@
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { IoLocationSharp, IoSearchSharp, IoSchool, IoTime, IoWallet } from 'react-icons/io5';
+
+import heroBG from "../../assets/home/heroBG.jpg";
+import Header from './header';
+
+const HOTSPOTS = [
+  { top: '30%', left: '25%' },
+  { top: '55%', left: '80%' },
+  { top: '65%', left: '35%' },
+  { top: '20%', left: '75%' },
+  { top: '55%', left: '15%' },
+];
+
+const CATEGORIES = ['Homes', 'Lands', 'Commercial'];
+
+const STATS = [
+  // { value: '5,000+', label: 'Verified Listings' },
+  // { value: '10,000+', label: 'Happy Seekers' },
+  // { value: '20+', label: 'Institutes Linked' },
+];
+
+const DestinationAutocomplete = ({ onPlaceSelect, placeholder }) => {
+  const [query, setQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (query.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+    const delayDebounce = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=Nashik ${encodeURIComponent(query)}&countrycodes=in&limit=5`);
+        if (res.ok) {
+          const data = await res.json();
+          setSuggestions(data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounce);
+  }, [query]);
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative w-full" ref={dropdownRef}>
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setShowDropdown(true);
+          if (!e.target.value) onPlaceSelect(null);
+        }}
+        onFocus={() => setShowDropdown(true)}
+        placeholder={placeholder}
+        className="w-full h-10 pl-10 pr-4 rounded-lg border-2 border-gray-100 bg-white text-xs font-semibold focus:border-primary/30 focus:ring-0 transition-all text-slate-900 outline-none"
+      />
+      {showDropdown && suggestions.length > 0 && (
+        <ul className="absolute z-[2000] w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto left-0 right-0">
+          {suggestions.map((item) => (
+            <li
+              key={item.place_id}
+              onClick={() => {
+                setQuery(item.display_name);
+                setShowDropdown(false);
+                onPlaceSelect({
+                  address: item.display_name,
+                  lat: parseFloat(item.lat),
+                  lng: parseFloat(item.lon)
+                });
+              }}
+              className="px-4 py-2 hover:bg-slate-50 cursor-pointer text-xs text-slate-700 truncate text-left"
+            >
+              {item.display_name}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+export default function Hero() {
+  const [activeCategory, setActiveCategory] = useState('Homes');
+  const [listingAction, setListingAction] = useState('');
+  const [timeFilter, setTimeFilter] = useState('');
+  const [locationData, setLocationData] = useState(null);
+
+  const router = useRouter();
+  const isFormValid = listingAction !== '' && timeFilter.trim() !== '' && locationData !== null;
+
+  const handleSearch = () => {
+    if (isFormValid) {
+      const queryParams = new URLSearchParams({
+        lat: locationData.lat,
+        lng: locationData.lng,
+        category: activeCategory,
+        listing_action: listingAction,
+        time_filter: timeFilter
+      });
+      router.push(`/listings?${queryParams.toString()}#${activeCategory.toLowerCase()}`);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background-light text-[#0f172a]">
+      {/* Header */}
+      <Header />
+
+      <section className="relative">
+        <div className="relative min-h-screen flex flex-col items-center justify-center pt-20">
+          {/* Background Map */}
+          <div className="absolute inset-0 z-0 opacity-30 mix-blend-multiply">
+            <Image
+              src={heroBG}
+              alt="Map background of Nashik city"
+              fill
+              priority
+              className="object-cover grayscale-map"
+              quality={90}
+            />
+          </div>
+
+          {/* Hotspots */}
+          <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+            {HOTSPOTS.map((pos, i) => (
+              <div
+                key={i}
+                className="absolute w-8 h-8 flex items-center justify-center text-primary/60 hover:text-primary transition-all duration-500 scale-90 hover:scale-110"
+                style={pos}
+              >
+                <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping"></div>
+                <IoLocationSharp className="text-xl" />
+              </div>
+            ))}
+          </div>
+
+          {/* Hero Content */}
+          <div className="relative z-20 max-w-4xl w-full px-6 flex flex-col items-center text-center">
+            <div className="mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/10 mb-4">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                <span className="text-primary font-bold tracking-[0.2em] uppercase text-[10px]">Nashik's Premier Property Platform</span>
+              </div>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 leading-[1.2] tracking-tight mb-4 font-display">
+                Your Gateway to <br/>
+                <span className="text-primary inline-block mt-1">Nashik Real Estate</span>
+              </h1>
+              <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto font-medium leading-relaxed">
+                Premium property discovery tailored for students and families. <br className="hidden md:block"/>Find your space in the heart of the wine capital.
+              </p>
+            </div>
+
+            {/* Search Box */}
+            <div className="w-full max-w-3xl bg-white/95 backdrop-blur-md rounded-xl shadow-[0_15px_30px_-8px_rgba(0,0,0,0.08)] p-4 md:p-5 border border-white">
+              <div className="flex justify-center mb-5">
+                <div className="inline-flex bg-gray-100 p-1 rounded-lg">
+                  {CATEGORIES.map((category) => (
+                    <label 
+                      key={category}
+                      className={`flex cursor-pointer items-center justify-center px-6 py-2 rounded-md transition-all font-extrabold text-xs ${
+                        activeCategory === category 
+                          ? 'bg-white shadow-md text-primary' 
+                          : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                    >
+                      <span className="capitalize">{category}</span>
+                      <input 
+                        type="radio" 
+                        name="category" 
+                        value={category} 
+                        className="hidden"
+                        checked={activeCategory === category}
+                        onChange={() => setActiveCategory(category)}
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-0.5 items-end">
+                {/* Time Filter Input */}
+                <div className="flex flex-col text-left md:col-span-3 lg:col-span-2">
+                  <label className="text-xs font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1.5">Time Filter (in minutes)</label>
+                  <div className="relative group">
+                    <IoTime className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors text-base" />
+                    <input 
+                      value={timeFilter}
+                      onChange={(e) => setTimeFilter(e.target.value)}
+                      className="w-full h-10 pl-10 pr-4 rounded-lg border-2 border-gray-100 bg-white text-xs font-semibold focus:border-primary/30 focus:ring-0 transition-all text-slate-900 outline-none" 
+                      placeholder="Ex: 10 mins" 
+                      type="number"
+                      min="1"
+                    />
+                  </div>
+                </div>
+               
+                {/* Property For Input */}
+                <div className="flex flex-col text-left md:col-span-3 lg:col-span-2">
+                  <label className="text-xs font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1.5">Property For</label>
+                  <div className="relative group">
+                    <IoWallet className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors text-base" />
+                    <select 
+                      value={listingAction}
+                      onChange={(e) => setListingAction(e.target.value)}
+                      className="w-full h-10 pl-10 pr-4 rounded-lg border-2 border-gray-100 bg-white text-xs font-semibold focus:border-primary/30 focus:ring-0 transition-all appearance-none cursor-pointer text-slate-900 outline-none"
+                    >
+                      <option value="" disabled>Select Type</option>
+                      <option value="Rent">Rent</option>
+                      <option value="Sale">Sale</option>
+                    </select>
+                  </div>
+                </div>
+    
+
+    
+                {/* Destination Input */}
+                <div className="flex flex-col text-left md:col-span-6 lg:col-span-6">
+                  <label className="text-xs font-extrabold text-gray-400 uppercase tracking-widest mb-1.5 ml-1.5">Location/Destination</label>
+                  <div className="relative group">
+                    <IoSchool className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors text-base z-10 pointer-events-none" />
+                    <DestinationAutocomplete 
+                      onPlaceSelect={(data) => setLocationData(data)}
+                      placeholder="e.g. KTHM College" 
+                    />
+                  </div>
+                </div>
+    
+                {/* Explore Now Button */}
+                <div className="md:col-span-12 lg:col-span-2 mt-2 lg:mt-0">
+                  <button 
+                    onClick={handleSearch}
+                    disabled={!isFormValid}
+                    className={`w-full h-10 text-white rounded-lg font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md transform ${
+                      isFormValid 
+                        ? 'bg-primary hover:bg-blue-600 shadow-primary/30 hover:scale-[1.02]' 
+                        : 'bg-gray-400 cursor-not-allowed opacity-70'
+                    }`}
+                  >
+                    <IoSearchSharp className="text-base" />
+                    <span>Explore Now</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="mt-12 flex flex-wrap justify-center gap-10 md:gap-16 opacity-80">
+              {STATS.map(({ value, label }) => (
+                <div key={label} className="text-center">
+                  <p className="text-xl md:text-2xl font-black text-slate-900">{value}</p>
+                  <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.25em] mt-1">{label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  );
+}

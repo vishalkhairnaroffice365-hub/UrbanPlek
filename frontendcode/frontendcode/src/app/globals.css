@@ -1,0 +1,255 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-poppins: var(--font-poppins);
+  --color-primary: #2b6cee;
+  --color-background-light: #f8fafc;
+  --color-background-dark: #0f172a;
+      --color-urban-blue: #2b6cee;
+
+  --color-brand-blue: #2b6cee;
+  --color-brand-navy: #0f172a;
+  --color-brand-indigo: #4338ca;
+}
+@layer utilities {
+  .bg-grid-pattern {
+    background-image: linear-gradient(to right, rgba(30, 58, 138, 0.05) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(30, 58, 138, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
+:root {
+  --brand-blue: #2b6cee;
+  --brand-navy: #0a1128;
+  --off-white: #f8fafc;
+  --soft-gray: #f1f5f9;
+}
+
+body {
+  background-color: var(--off-white);
+  color: var(--brand-navy);
+  font-family: var(--font-poppins), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.grayscale-map {
+  filter: grayscale(100%) brightness(1.05) contrast(1.05);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0));
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.luxury-light-gradient {
+  background: radial-gradient(circle at 0% 0%, rgba(43, 108, 238, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 100% 100%, rgba(10, 17, 40, 0.03) 0%, transparent 50%),
+              linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+}
+
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(10, 17, 40, 0.1);
+}
+
+.abstract-glow-light {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(43, 108, 238, 0.08) 0%, transparent 70%);
+  filter: blur(60px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-fade-in-up-delay {
+  animation: fadeInUp 0.6s ease-out 0.5s forwards;
+  opacity: 0; /* Start hidden */
+}
+
+@layer utilities {
+  .social-icon {
+    @apply transition-all duration-300;
+  }
+  .social-icon:hover {
+    background-color: var(--color-primary);
+    color: white !important;
+  }
+}
+
+
+@layer utilities {
+  .mesh-gradient {
+    background-color: var(--color-brand-blue);
+    background-image: 
+        radial-gradient(at 0% 0%, var(--color-brand-blue) 0, transparent 50%), 
+        radial-gradient(at 50% 0%, var(--color-brand-indigo) 0, transparent 50%), 
+        radial-gradient(at 100% 0%, var(--color-brand-navy) 0, transparent 50%),
+        radial-gradient(at 0% 100%, #1e293b 0, transparent 50%),
+        radial-gradient(at 100% 100%, var(--color-brand-blue) 0, transparent 50%);
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .input-minimal {
+    @apply w-full px-0 py-3 bg-transparent border-0 border-b border-slate-200 focus:border-brand-blue focus:ring-0 transition-all duration-300 outline-none;
+  }
+}
+.themed-map {
+  filter: grayscale(100%) invert(92%) contrast(83%);
+  mix-blend-mode: multiply;
+}
+
+.map-container {
+  position: relative;
+  overflow: hidden;
+  /* pointer-events: none; Removed to allow interaction */
+}
+
+.map-brand-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(43, 108, 238, 0.1) 0%, rgba(15, 23, 42, 0.05) 100%);
+  mix-blend-mode: color;
+  pointer-events: none;
+}
+
+  .input-modern {
+    @apply w-full px-6 py-4 bg-slate-50 border border-transparent focus:bg-white focus:border-brand-blue/30 rounded-2xl focus:ring-4 focus:ring-brand-blue/10 transition-all duration-300 outline-none text-slate-700 font-medium placeholder:text-slate-400;
+  }
+
+@layer utilities {
+  .animate-urban-fade-up {
+    animation: urbanFadeInUp 0.6s ease-out forwards;
+  }
+  
+  .animate-urban-fade-left {
+    animation: urbanFadeInLeft 0.6s ease-out forwards;
+  }
+  
+  .animate-urban-expand {
+    animation: urbanExpandWidth 0.8s ease-out forwards;
+  }
+  
+  .delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .delay-300 {
+    animation-delay: 300ms;
+  }
+}
+
+@keyframes urbanFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes urbanFadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes urbanExpandWidth {
+  from {
+    width: 0;
+  }
+  to {
+    width: 8rem; /* 128px */
+  }
+}
+
+
+.card-shadow {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+.btn-underline {
+  position: relative;
+  padding-bottom: 2px;
+  border-bottom: 2px solid var(--color-urban-blue);
+  transition: opacity 0.2s ease;
+}
+
+.btn-underline:hover {
+  opacity: 0.8;
+}
+
+/* CSS Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.card-hover-effect {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover-effect:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+}
