@@ -105,7 +105,7 @@ export const getAllListings = async (req: Request, res: Response): Promise<void>
 
     if (type) where.propertyType = type;
     if (subtype) where.subtype = subtype;
-    
+
     if (price_min || price_max) {
       where.price = {};
       if (price_min) where.price.gte = parseInt(price_min as string, 10);
