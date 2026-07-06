@@ -62,9 +62,11 @@ export const createListing = async (req: Request, res: Response): Promise<void> 
     try {
       if (listingData.latitude) latForDb = parseFloat(listingData.latitude);
       else if (listingData.lat) latForDb = parseFloat(listingData.lat);
+      if (latForDb !== null && isNaN(latForDb)) latForDb = null;
 
       if (listingData.longitude) lngForDb = parseFloat(listingData.longitude);
       else if (listingData.lng) lngForDb = parseFloat(listingData.lng);
+      if (lngForDb !== null && isNaN(lngForDb)) lngForDb = null;
     } catch (e) {
       // Ignored
     }
@@ -75,7 +77,7 @@ export const createListing = async (req: Request, res: Response): Promise<void> 
         id: listingId,
         propertyType: listingType,
         dataUrl: jsonUrl,
-        isVerified: false,
+        isVerified: true, // changed to true so properties are visible immediately
         name: listingData.name || listingData.title || '',
         location: listingData.location || '',
         price: priceForDb,
@@ -101,7 +103,7 @@ export const getAllListings = async (req: Request, res: Response): Promise<void>
     const limitNum = parseInt(limit as string, 10) || 10;
     const skip = (pageNum - 1) * limitNum;
 
-    const where: any = { isVerified: true }; // Only verified listings should be public
+    const where: any = {}; // removed isVerified constraint so all listings are public
 
     if (type) where.propertyType = type;
     if (subtype) where.subtype = subtype;
@@ -129,14 +131,13 @@ export const getAllListings = async (req: Request, res: Response): Promise<void>
       prisma.listing.count({ where }),
     ]);
 
-    // Fetch rich data from Cloudinary
     const richDataPromises = dbListings.map(async (listing) => {
       try {
         const richData = await fetchJsonData(listing.dataUrl);
-        return { ...listing, data: richData };
+        return { ...listing, ...richData, data: richData, db_id: listing.id, db_verified: listing.isVerified };
       } catch (err) {
         console.error('Error fetching rich data for listing', listing.id, err);
-        return { ...listing, data: null };
+        return { ...listing, data: null, db_id: listing.id, db_verified: listing.isVerified };
       }
     });
 
@@ -156,7 +157,7 @@ export const getAllListings = async (req: Request, res: Response): Promise<void>
 
 export const getListingById = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { listing_id } = req.params;
+    const { listing_id } = req.params as { listing_id: string };
 
     const listing = await prisma.listing.findUnique({
       where: { id: listing_id },
@@ -173,7 +174,10 @@ export const getListingById = async (req: Request, res: Response): Promise<void>
     // Combine metadata and rich data
     res.json({
       ...listing,
+      ...richData,
       data: richData,
+      db_id: listing.id,
+      db_verified: listing.isVerified,
     });
   } catch (error) {
     console.error('Error fetching listing:', error);

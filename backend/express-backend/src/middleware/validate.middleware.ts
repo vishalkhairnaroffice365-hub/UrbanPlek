@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodSchema, ZodError } from 'zod';
+import { ZodType, ZodError } from 'zod';
 
-export const validateRequest = (schema: ZodSchema) => {
+export const validateRequest = (schema: ZodType) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {
       // Validate body, query, and params if defined in the schema
@@ -15,7 +15,7 @@ export const validateRequest = (schema: ZodSchema) => {
       if (error instanceof ZodError) {
         res.status(400).json({
           error: 'Validation Error',
-          details: error.errors,
+          details: error.issues,
         });
         return;
       }

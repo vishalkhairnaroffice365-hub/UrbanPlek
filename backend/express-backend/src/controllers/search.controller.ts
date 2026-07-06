@@ -17,9 +17,7 @@ export const searchListings = async (req: Request, res: Response): Promise<void>
     const radius = parseFloat(maxDistance as string);
 
     // Filter by category if provided
-    const whereClause: any = {
-      isVerified: true, // Only return verified listings
-    };
+    const whereClause: any = {};
 
     if (category) {
       whereClause.propertyType = category as string;
@@ -43,7 +41,10 @@ export const searchListings = async (req: Request, res: Response): Promise<void>
       const richData = await fetchJsonData(listing.dataUrl);
       return {
         ...listing,
+        ...richData,
         data: richData,
+        db_id: listing.id,
+        db_verified: listing.isVerified,
       };
     });
 
