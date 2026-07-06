@@ -60,9 +60,14 @@ export default function LeafletSelectMap({ formData, handleInputChange }) {
     try {
       // Nominatim search biased to Nashik, India
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=Nashik ${encodeURIComponent(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
           query
-        )}&countrycodes=in&limit=5`
+        )} Nashik&countrycodes=in&limit=5`,
+        {
+          headers: {
+            'Accept-Language': 'en-US,en;q=0.9',
+          },
+        }
       );
       if (response.ok) {
         const data = await response.json();

@@ -38,7 +38,11 @@ const DestinationAutocomplete = ({ onPlaceSelect, placeholder }) => {
     }
     const delayDebounce = setTimeout(async () => {
       try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=Nashik ${encodeURIComponent(query)}&countrycodes=in&limit=5`);
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)} Nashik&countrycodes=in&limit=5`, {
+          headers: {
+            'Accept-Language': 'en-US,en;q=0.9',
+          }
+        });
         if (res.ok) {
           const data = await res.json();
           setSuggestions(data);
