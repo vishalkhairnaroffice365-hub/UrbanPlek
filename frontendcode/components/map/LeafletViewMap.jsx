@@ -14,8 +14,8 @@ const customIcon = L.icon({
 });
 
 export default function LeafletViewMap({ latitude, longitude }) {
-  const lat = parseFloat(latitude);
-  const lng = parseFloat(longitude);
+  const lat = parseFloat(latitude) || 19.9975;
+  const lng = parseFloat(longitude) || 73.7898;
 
   return (
     <div className="h-full w-full relative z-[1]">

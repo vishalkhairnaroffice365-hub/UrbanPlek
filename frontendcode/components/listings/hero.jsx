@@ -21,19 +21,21 @@ const DestinationAutocomplete = ({ onPlaceSelect, placeholder }) => {
     }
     const delayDebounce = setTimeout(async () => {
       try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)} Nashik&countrycodes=in&limit=5`, {
-          headers: {
-            'Accept-Language': 'en-US,en;q=0.9',
-          }
-        });
+        const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)} Nashik&limit=5`);
         if (res.ok) {
-          const data = await res.json();
+          const geojson = await res.json();
+          const data = geojson.features.map(f => ({
+            place_id: f.properties.osm_id || Math.random(),
+            display_name: [f.properties.name, f.properties.street, f.properties.city, f.properties.state, f.properties.country].filter(Boolean).join(', '),
+            lat: f.geometry.coordinates[1].toString(),
+            lon: f.geometry.coordinates[0].toString(),
+          }));
           setSuggestions(data);
         }
       } catch (err) {
         console.error(err);
       }
-    }, 400);
+    }, 600);
 
     return () => clearTimeout(delayDebounce);
   }, [query]);

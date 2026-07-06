@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Listing {
+  id             String   @id @default(uuid())
+  propertyType   String   // residential, student, commercial, land
+  createdAt      DateTime @default(now())
+  isVerified     Boolean  @default(false)
+  dataUrl        String   // Cloudinary URL pointing to full JSON data
+  name           String
+  location       String
+  price          Int?
+  subtype        String?  // PG, Hostel, Room/Flat
+  listingAction  String?   // Rent, Sale
+  lat            Float?
+  lng            Float?
+
+  @@index([lat, lng])
+  @@index([propertyType])
+}

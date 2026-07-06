@@ -39,6 +39,7 @@ export default function LeafletSelectMap({ formData, handleInputChange }) {
   const [searchResults, setSearchResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const searchTimeoutRef = useRef(null);
 
   const latitude = parseFloat(formData.latitude) || 19.9975;
   const longitude = parseFloat(formData.longitude) || 73.7898;
@@ -58,19 +59,17 @@ export default function LeafletSelectMap({ formData, handleInputChange }) {
   const handleSearch = async (query) => {
     if (query.length < 3) return;
     try {
-      // Nominatim search biased to Nashik, India
+      // Using Photon by Komoot as it's more permissive than Nominatim
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          query
-        )} Nashik&countrycodes=in&limit=5`,
-        {
-          headers: {
-            'Accept-Language': 'en-US,en;q=0.9',
-          },
-        }
+        `https://photon.komoot.io/api/?q=${encodeURIComponent(query)} Nashik&limit=5`
       );
       if (response.ok) {
-        const data = await response.json();
+        const geojson = await response.json();
+        const data = geojson.features.map(f => ({
+          lat: f.geometry.coordinates[1].toString(),
+          lon: f.geometry.coordinates[0].toString(),
+          display_name: [f.properties.name, f.properties.street, f.properties.city, f.properties.state, f.properties.country].filter(Boolean).join(', ')
+        }));
         setSearchResults(data);
         setShowDropdown(true);
       }
@@ -107,8 +106,12 @@ export default function LeafletSelectMap({ formData, handleInputChange }) {
           type="text"
           value={searchQuery}
           onChange={(e) => {
-            setSearchQuery(e.target.value);
-            handleSearch(e.target.value);
+            const val = e.target.value;
+            setSearchQuery(val);
+            if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+            searchTimeoutRef.current = setTimeout(() => {
+              handleSearch(val);
+            }, 600);
           }}
           placeholder="Search location in Nashik (Leaflet/OSM)..."
           className="h-12 w-full px-4 text-sm rounded-xl shadow-md border border-gray-200 bg-white outline-none focus:ring-2 focus:ring-blue-400 text-slate-800"
