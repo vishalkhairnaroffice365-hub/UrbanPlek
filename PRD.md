@@ -14,7 +14,7 @@
 - **Framework:** Next.js (App Router) v14+ / React 19
 - **Styling:** Tailwind CSS v4, PostCSS
 - **Authentication:** Clerk (`@clerk/nextjs`)
-- **Maps & Geolocation:** Leaflet, React-Leaflet, Nominatim OpenStreetMap API
+- **Maps & Geolocation:** Google Maps JavaScript API, `@react-google-maps/api`, Google Places Autocomplete
 - **Animations:** Motion (`framer-motion` alternative)
 - **Icons:** React Icons (`react-icons/io5`)
 
@@ -108,7 +108,7 @@ UrbanPlek/
 5. Frontend calls `GET /api/search` or `GET /api/listings`.
 6. **Express backend** calculates geographic distances using the **Haversine formula** (via `geo.service.js`) and fetches matching listing metadata from PostgreSQL through **Prisma**.
 7. Backend dynamically fetches the rich JSON data for those listings from Cloudinary in parallel using `Promise.all()`.
-8. Results are displayed as cards and plotted on the interactive `LeafletViewMap`.
+8. Results are displayed as cards and plotted on the interactive `GoogleViewMap`.
 
 ### B. Viewing Property Details
 1. User clicks a specific property card.
@@ -120,7 +120,7 @@ UrbanPlek/
 ### C. Adding a Property Listing (Authenticated User)
 1. User navigates to `/list-your-property`.
 2. Selects the type of property (e.g., Residential, Land).
-3. Fills out extensive form data including placing a pin on the `LeafletSelectMap`.
+3. Fills out extensive form data including placing a pin on the `GoogleSelectMap`.
 4. Submits form via `POST /api/listings` (multipart/form-data, handled via `multer`).
 5. **Backend Processing (Express):**
    - Auth middleware verifies the Clerk session token before proceeding.
@@ -197,7 +197,7 @@ model Listing {
 
 ## 7. Architecture Highlights & Trade-offs
 - **JSON in Cloudinary:** Storing JSON in Cloudinary instead of PostgreSQL columns keeps the database extremely lightweight and fast, but requires an extra HTTP request (managed concurrently via `Promise.all()`) to fetch full property details.
-- **Client-Side Maps:** Leaflet is imported dynamically or guarded by `'use client'` to prevent SSR issues in Next.js.
+- **Client-Side Maps:** Google Maps components are dynamically imported or guarded by `'use client'` to prevent SSR issues in Next.js.
 - **Node Async I/O:** Express's native async/await and non-blocking I/O model natively handles concurrent Cloudinary upload/download without needing manual thread pools, simplifying the code compared to the Python implementation.
 - **Serverless Cold Starts:** Using Neon's serverless driver (`@neondatabase/serverless`) with connection pooling is recommended over long-lived Prisma connections to avoid exhausting Neon's connection limits under Vercel's serverless function model.
 

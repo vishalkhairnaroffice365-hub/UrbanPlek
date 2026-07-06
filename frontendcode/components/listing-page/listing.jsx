@@ -22,7 +22,10 @@ import dynamic from 'next/dynamic';
 import OWNERPFP_IMAGE from "../../assets/ownerpfp.jpg"
 import { BACKEND_URL } from '../../constants/constants';
 
-const LeafletViewMap = dynamic(() => import('../map/LeafletViewMap'), { ssr: false });
+const GoogleViewMap = dynamic(() => import('../map/GoogleViewMap'), { 
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-slate-100 animate-pulse rounded-xl" />
+});
 
 const Listing = ({ listing_id }) => {
   const [data, setData] = useState(null);
@@ -317,7 +320,7 @@ const Listing = ({ listing_id }) => {
             <div className="w-full h-64 bg-slate-100 rounded-xl overflow-hidden relative border border-slate-200">
               {data?.latitude && data?.longitude ? (
                 <>
-                  <LeafletViewMap latitude={data.latitude} longitude={data.longitude} />
+                  <GoogleViewMap latitude={data.latitude} longitude={data.longitude} />
                   <a 
                     href={`https://maps.google.com/?q=${data.latitude},${data.longitude}`} 
                     target="_blank" 

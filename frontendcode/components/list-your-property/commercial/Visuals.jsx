@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { SectionTitle } from "../residential/SectionTitle";
 import { MdAddAPhoto, MdUploadFile, MdClose } from 'react-icons/md';
 
-const LeafletSelectMap = dynamic(() => import('../../map/LeafletSelectMap'), { ssr: false });
+const GoogleSelectMap = dynamic(() => import('../../map/GoogleSelectMap'), { ssr: false });
 
 export const Visuals = ({ formData, handleInputChange, onFileChange }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -123,7 +123,7 @@ export const Visuals = ({ formData, handleInputChange, onFileChange }) => {
           <p className="text-slate-500 text-xs">Upload up to 4 photos. Only image files are accepted.</p>
         </div>
 
-        <LeafletSelectMap formData={formData} handleInputChange={handleInputChange} />
+        <GoogleSelectMap formData={formData} handleInputChange={handleInputChange} />
         
         <div className="grid grid-cols-1 gap-4">
           <input 
